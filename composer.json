@@ -1,0 +1,52 @@
+{
+    "name": "spatie/pbm-php-sdk-video-api",
+    "description": "This package is a PHP Restclient SDK for PBM Video API",
+    "keywords": [
+        "spatie",
+        "pbm-php-sdk-video-api"
+    ],
+    "homepage": "https://github.com/spatie/pbm-php-sdk-video-api",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Stefan Riehl",
+            "email": "systems@personal-business-machine.com",
+            "homepage": "https://spatie.be",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.3"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^4.3",
+        "phpunit/phpunit": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spatie\\Skeleton\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Spatie\\Skeleton\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Spatie\\Skeleton\\SkeletonServiceProvider"
+            ],
+            "aliases": {
+                "Skeleton": "Spatie\\Skeleton\\SkeletonFacade"
+            }
+        }
+    }
+}
