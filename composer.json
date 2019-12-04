@@ -1,22 +1,24 @@
 {
-    "name": "spatie/pbm-php-sdk-video-api",
-    "description": "This package is a PHP Restclient SDK for PBM Video API",
+    "name": "pbmengine/php-sdk-video-api",
+    "description": "This package is a PHP Rest Client SDK for PBM Video API",
     "keywords": [
-        "spatie",
-        "pbm-php-sdk-video-api"
+        "pbm",
+        "PBM Video API",
+        "php-sdk-video-api"
     ],
-    "homepage": "https://github.com/spatie/pbm-php-sdk-video-api",
+    "homepage": "https://github.com/pbmengine/php-sdk-video-api",
     "license": "MIT",
     "authors": [
         {
             "name": "Stefan Riehl",
             "email": "systems@personal-business-machine.com",
-            "homepage": "https://spatie.be",
+            "homepage": "https://personal-business-machine.com",
             "role": "Developer"
         }
     ],
     "require": {
-        "php": "^7.3"
+        "php": "^7.2",
+        "pbmengine/php-restclient" : "0.9.*"
     },
     "require-dev": {
         "symfony/var-dumper": "^4.3",
@@ -24,12 +26,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Spatie\\Skeleton\\": "src"
+            "Pbmengine\\VideoApiClient\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\Skeleton\\Tests\\": "tests"
+            "Pbmengine\\VideoApiClient\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -42,10 +44,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Spatie\\Skeleton\\SkeletonServiceProvider"
+                "Pbmengine\\VideoApiClient\\ClientServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "Spatie\\Skeleton\\SkeletonFacade"
+                "Skeleton": "Pbmengine\\VideoApiClient\\ClientFacade"
             }
         }
     }
