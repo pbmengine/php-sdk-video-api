@@ -18,7 +18,8 @@
     ],
     "require": {
         "php": "^7.2",
-        "pbmengine/php-restclient" : "0.9.*"
+        "pbmengine/php-restclient": "0.9.*",
+        "spatie/data-transfer-object": "^1.11"
     },
     "require-dev": {
         "symfony/var-dumper": "^4.3",
@@ -35,8 +36,7 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+        "test": "phpunit"
     },
     "config": {
         "sort-packages": true

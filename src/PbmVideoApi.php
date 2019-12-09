@@ -4,11 +4,18 @@ namespace Pbmengine\VideoApiClient;
 
 use Pbmengine\Restclient\HttpClient;
 use Pbmengine\Restclient\HttpResponse;
+use Pbmengine\VideoApiClient\Concerns\HandleDestinations;
 use Pbmengine\VideoApiClient\Concerns\HandleProjects;
+use Pbmengine\VideoApiClient\Exceptions\NotFoundException;
+use Pbmengine\VideoApiClient\Exceptions\ServerException;
+use Pbmengine\VideoApiClient\Exceptions\ValidationException;
+use Pbmengine\VideoApiClient\Query\Builder;
+use Pbmengine\VideoApiClient\Query\Contracts\BuilderSerializer;
 
 class PbmVideoApi
 {
-    use HandleProjects;
+    use HandleProjects,
+        HandleDestinations;
 
     /** @var string */
     protected $basePath;
@@ -22,12 +29,12 @@ class PbmVideoApi
     /** @var string */
     protected $secretKey;
 
-    public function __construct($basePath, $apiKey, $accessKey = null, $secretKey = null)
+    public function __construct($basePath, $apiKey, $accessKey, $secretKey)
     {
         $this->basePath = $basePath;
         $this->apiKey = $apiKey;
-        $this->accessKey = is_null($accessKey) ? config('pbm-video-api.access_key') : $accessKey;
-        $this->secretKey = is_null($secretKey) ? config('pbm-video-api.secret_key') : $secretKey;
+        $this->accessKey = $accessKey;
+        $this->secretKey = $secretKey;
     }
 
     protected function getClient(): HttpClient
@@ -43,25 +50,18 @@ class PbmVideoApi
         return $client;
     }
 
-    public function secretKey($key): self
+    public function setSecretKey($key): self
     {
         $this->secretKey = $key;
 
         return $this;
     }
 
-    public function accessKey($key): self
+    public function setAccessKey($key): self
     {
         $this->accessKey = $key;
 
         return $this;
-    }
-
-    public function destinations(): HttpResponse
-    {
-        return $this
-            ->getClient()
-            ->get('destinations');
     }
 
     protected function getAuthHeaders(): array
@@ -71,5 +71,43 @@ class PbmVideoApi
             'x-access-key' => $this->accessKey,
             'x-secret-key' => $this->secretKey,
         ];
+    }
+
+    protected function transformCollection(array $collection, $class, $dto): array
+    {
+        return array_map(function ($data) use ($class, $dto) {
+            return new $class($dto::fromApiResponse($data), $this);
+        }, $collection);
+    }
+
+    protected function handleResponse(HttpResponse $response): HttpResponse
+    {
+        if ($response->isValid()) {
+            return $response;
+        }
+
+        $this->handleResponseError($response);
+    }
+
+    protected function handleResponseError(HttpResponse $response)
+    {
+        if ($response->statusCode() == 404) {
+            throw new NotFoundException();
+        }
+
+        if ($response->statusCode() == 422) {
+            throw new ValidationException();
+        }
+
+        if ($response->isServerError()) {
+            throw new ServerException();
+        }
+
+        throw new \Exception('error');
+    }
+
+    public function query()
+    {
+
     }
 }
