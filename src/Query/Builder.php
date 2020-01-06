@@ -3,6 +3,7 @@
 namespace Pbmengine\VideoApiClient\Query;
 
 use Pbmengine\VideoApiClient\Query\Contracts\BuilderSerializer;
+use Pbmengine\VideoApiClient\Query\Serializer\JsonApiSerializer;
 
 class Builder
 {
@@ -360,9 +361,18 @@ class Builder
         return $this;
     }
 
+    protected function setDefaultSerializer()
+    {
+        $this->serializer = new JsonApiSerializer();
+    }
+
     public function toArray()
     {
-        $this->serializer
+        if ($this->serializer == null) {
+            $this->setDefaultSerializer();
+        }
+
+        return $this->serializer
             ->setBuilder($this)
             ->compileComponents()
             ->toArray();
@@ -378,7 +388,11 @@ class Builder
 
     public function toString()
     {
-        $this->serializer
+        if ($this->serializer == null) {
+            $this->setDefaultSerializer();
+        }
+
+        return $this->serializer
             ->setBuilder($this)
             ->compileComponents()
             ->toString();

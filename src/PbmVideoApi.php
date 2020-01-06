@@ -6,15 +6,18 @@ use Pbmengine\Restclient\HttpClient;
 use Pbmengine\Restclient\HttpResponse;
 use Pbmengine\VideoApiClient\Concerns\HandleDestinations;
 use Pbmengine\VideoApiClient\Concerns\HandleProjects;
+use Pbmengine\VideoApiClient\Concerns\HandleTemplates;
+use Pbmengine\VideoApiClient\Concerns\HandleVideos;
 use Pbmengine\VideoApiClient\Exceptions\NotFoundException;
 use Pbmengine\VideoApiClient\Exceptions\ServerException;
 use Pbmengine\VideoApiClient\Exceptions\ValidationException;
 use Pbmengine\VideoApiClient\Query\Builder;
-use Pbmengine\VideoApiClient\Query\Contracts\BuilderSerializer;
 
 class PbmVideoApi
 {
     use HandleProjects,
+        HandleTemplates,
+        HandleVideos,
         HandleDestinations;
 
     /** @var string */
@@ -28,6 +31,12 @@ class PbmVideoApi
 
     /** @var string */
     protected $secretKey;
+
+    /** @var array|null */
+    protected $queryParams;
+
+    /** @var string|null */
+    protected $queryString;
 
     public function __construct($basePath, $apiKey, $accessKey, $secretKey)
     {
@@ -67,7 +76,7 @@ class PbmVideoApi
     protected function getAuthHeaders(): array
     {
         return [
-            'x-api-key' => $this->apiKey,
+            'x-api-key'    => $this->apiKey,
             'x-access-key' => $this->accessKey,
             'x-secret-key' => $this->secretKey,
         ];
@@ -78,6 +87,11 @@ class PbmVideoApi
         return array_map(function ($data) use ($class, $dto) {
             return new $class($dto::fromApiResponse($data), $this);
         }, $collection);
+    }
+
+    protected function transformItem(array $item, $class, $dto)
+    {
+        return new $class($dto::fromApiResponse($item), $this);
     }
 
     protected function handleResponse(HttpResponse $response): HttpResponse
@@ -92,22 +106,33 @@ class PbmVideoApi
     protected function handleResponseError(HttpResponse $response)
     {
         if ($response->statusCode() == 404) {
-            throw new NotFoundException();
+            throw new NotFoundException($response->contentAsJson());
         }
 
         if ($response->statusCode() == 422) {
-            throw new ValidationException();
+            throw new ValidationException($response->contentAsJson());
         }
 
         if ($response->isServerError()) {
-            throw new ServerException();
+            throw new ServerException($response->contentAsJson());
         }
 
         throw new \Exception('error');
     }
 
-    public function query()
+    public function query(Builder $builder)
     {
+        $this->queryString = $builder->toString();
 
+        return $this;
+    }
+
+    protected function getQueryString()
+    {
+        if ($this->queryString == null) {
+            return '';
+        }
+
+        return '?' . $this->queryString;
     }
 }

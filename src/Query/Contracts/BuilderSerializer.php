@@ -25,4 +25,6 @@ interface BuilderSerializer
     public function compileOffset();
 
     public function compileColumns();
+
+    public function compileComponents();
 }
